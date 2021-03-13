@@ -19,3 +19,7 @@ A learning log of [wgld.org](https://wgld.org/).
 - [w024](https://amamagi.github.io/wgld-samples/w024/)
 - [w025](https://amamagi.github.io/wgld-samples/w025/)
 - [w026](https://amamagi.github.io/wgld-samples/w026/)
+- [w027](https://amamagi.github.io/wgld-samples/w027/)
+- [w029](https://amamagi.github.io/wgld-samples/w029/)
+- [w030](https://amamagi.github.io/wgld-samples/w030/)
+- [w032](https://amamagi.github.io/wgld-samples/w032/)
