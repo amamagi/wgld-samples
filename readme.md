@@ -6,22 +6,24 @@ A learning log of [wgld.org](https://wgld.org/).
 
 ### Rendered
 <!--rendered-->
-- [w007](https://amamagi.github.io/wgld-samples/w007/)
-- [w011](https://amamagi.github.io/wgld-samples/w011/)
-- [w015](https://amamagi.github.io/wgld-samples/w015/)
-- [w016](https://amamagi.github.io/wgld-samples/w016/)
-- [w017](https://amamagi.github.io/wgld-samples/w017/)
-- [w018](https://amamagi.github.io/wgld-samples/w018/)
-- [w019](https://amamagi.github.io/wgld-samples/w019/)
-- [w020](https://amamagi.github.io/wgld-samples/w020/)
-- [w021](https://amamagi.github.io/wgld-samples/w021/)
-- [w022](https://amamagi.github.io/wgld-samples/w022/)
-- [w023](https://amamagi.github.io/wgld-samples/w023/)
-- [w024](https://amamagi.github.io/wgld-samples/w024/)
-- [w025](https://amamagi.github.io/wgld-samples/w025/)
-- [w026](https://amamagi.github.io/wgld-samples/w026/)
-- [w027](https://amamagi.github.io/wgld-samples/w027/)
-- [w029](https://amamagi.github.io/wgld-samples/w029/)
-- [w030](https://amamagi.github.io/wgld-samples/w030/)
-- [w032](https://amamagi.github.io/wgld-samples/w032/)
+<img src="w007/thumb.png" alt="w007" width="200"/>
+<img src="w011/thumb.png" alt="w011" width="200"/>
+<img src="w015/thumb.png" alt="w015" width="200"/>
+<img src="w016/thumb.png" alt="w016" width="200"/>
+<img src="w017/thumb.png" alt="w017" width="200"/>
+<img src="w018/thumb.png" alt="w018" width="200"/>
+<img src="w019/thumb.png" alt="w019" width="200"/>
+<img src="w020/thumb.png" alt="w020" width="200"/>
+<img src="w021/thumb.png" alt="w021" width="200"/>
+<img src="w022/thumb.png" alt="w022" width="200"/>
+<img src="w023/thumb.png" alt="w023" width="200"/>
+<img src="w024/thumb.png" alt="w024" width="200"/>
+<img src="w025/thumb.png" alt="w025" width="200"/>
+<img src="w026/thumb.png" alt="w026" width="200"/>
+<img src="w027/thumb.png" alt="w027" width="200"/>
+<img src="w029/thumb.png" alt="w029" width="200"/>
+<img src="w030/thumb.png" alt="w030" width="200"/>
+<img src="w032/thumb.png" alt="w032" width="200"/>
+<img src="w033/thumb.png" alt="w033" width="200"/>
+<img src="w034/thumb.png" alt="w034" width="200"/>
 <!--rendered-->
