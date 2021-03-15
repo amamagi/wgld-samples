@@ -1,4 +1,5 @@
 import os
+from PIL import Image
 
 def main():
     ls = os.listdir()
@@ -8,10 +9,23 @@ def main():
             dir.append(obj)
 
     gen_lines = ''
+    thumb = 'thumb.png'
     base = 'https://amamagi.github.io/wgld-samples'
+    width = '200'
     for d in dir:
-        gen_lines += '- [{0}]({1}/{0}/)\n'.format(d, base)
-    
+        img_path = '{0}/{1}'.format(d, thumb)
+        if not os.path.exists(img_path):
+            continue
+        img = Image.open(img_path)
+        img_size = img.size
+        if not img_size[0] == img_size[1]:
+            img = crop_max_square(img)
+            img.save(img_path)
+            print('croped ' + img_path)
+        gen_lines += '<a href="{3}/{4}"><img src="{0}" alt="{1}" width="{2}"/></a>'.format(img_path, d, width, base, d)
+
+    gen_lines += '\n'
+
     readme = 'readme.md'
     gen_body = ""
     with open(readme, 'r') as f:
@@ -42,6 +56,16 @@ def main():
     
     with open(readme, 'w') as f:
         f.write(gen_body)
+
+def crop_max_square(pil_img):
+    return crop_center(pil_img, min(pil_img.size), min(pil_img.size))
+
+def crop_center(pil_img, crop_width, crop_height):
+    img_width, img_height = pil_img.size
+    return pil_img.crop(((img_width - crop_width) // 2,
+                         (img_height - crop_height) // 2,
+                         (img_width + crop_width) // 2,
+                         (img_height + crop_height) // 2))
 
 if __name__ == '__main__':
     main()
