@@ -87,7 +87,7 @@ onload = function(){
     var count = 0;
 
     (function(){
-        gl.clearColor(.8,.7,1.,1.);
+        gl.clearColor(0.,0.,0.,1.);
         gl.clearDepth(1.);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
