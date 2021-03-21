@@ -26,17 +26,30 @@ void main(void){
 	vec3 invLight = (invMatrix * vec4(lightPosition, 0.0)).xyz;
 	vec3 eye      = invEye - pos;
 	vec3 light    = invLight - pos;
+
+	// 法線(normal)
 	vec3 n = normalize(normal);
+
+	// 接線(tangent) = normal x up
 	vec3 t = normalize(cross(normal, vec3(0.0, 1.0, 0.0)));
+
+	// 従法線(binormal) = normal x tangent
 	vec3 b = cross(n, t);
+
+	// 接空間: (x: tangent, y: binormal, z: normal) 
+
+	// 視線ベクトルを接空間に変換
 	vEyeDirection.x   = dot(t, eye);
 	vEyeDirection.y   = dot(b, eye);
 	vEyeDirection.z   = dot(n, eye);
 	normalize(vEyeDirection);
+
+	// ライトベクトルを接空間に変換
 	vLightDirection.x = dot(t, light);
 	vLightDirection.y = dot(b, light);
 	vLightDirection.z = dot(n, light);
 	normalize(vLightDirection);
+	
 	vColor         = color;
 	vTextureCoord  = textureCoord;
 	gl_Position    = mvpMatrix * vec4(position, 1.0);
@@ -53,12 +66,17 @@ varying vec3      vEyeDirection;
 varying vec3      vLightDirection;
 
 void main(void){
+	// 法線マップを -1 ~ 1 正規化
 	vec3 mNormal    = (texture2D(texture, vTextureCoord) * 2.0 - 1.0).rgb;
+
 	vec3 light      = normalize(vLightDirection);
 	vec3 eye        = normalize(vEyeDirection);
 	vec3 halfLE     = normalize(light + eye);
+
+	// 接空間内のライティング計算
 	float diffuse   = clamp(dot(mNormal, light), 0.1, 1.0);
 	float specular  = pow(clamp(dot(mNormal, halfLE), 0.0, 1.0), 100.0);
+
 	vec4  destColor = vColor * vec4(vec3(diffuse), 1.0) + vec4(vec3(specular), 1.0);
 	gl_FragColor    = destColor;
 }
