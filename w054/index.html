@@ -1,12 +1,11 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		<title>wgld.org WebGL sample 040</title>
+		<title>wgld.org WebGL sample 041</title>
 		<script src="https://wgld.org/j/minMatrixb.js" type="text/javascript"></script>
 		<script src="script.js" type="text/javascript"></script>
 		
 		<script id="vs" type="x-shader/x-vertex">
-// グローシェーディング
 attribute vec3 position;
 attribute vec3 normal;
 attribute vec4 color;
@@ -38,9 +37,8 @@ void main(void){
 	gl_FragColor = vColor;
 }
 		</script>
-
+		
 		<script id="ovs" type="x-shader/x-vertex">
-// イメージエフェクト用シェーダー
 attribute vec3 position;
 attribute vec2 texCoord;
 uniform   mat4 mvpMatrix;
@@ -57,20 +55,27 @@ precision mediump float;
 
 uniform sampler2D texture;
 uniform bool      grayScale;
+uniform bool      sepia;
 varying vec2      vTexCoord;
 
-// NTSC系加重平均法 (よくあるグレースケールの係数)
 const float redScale   = 0.298912;
 const float greenScale = 0.586611;
 const float blueScale  = 0.114478;
 const vec3  monochromeScale = vec3(redScale, greenScale, blueScale);
 
+const float sRedScale   = 1.07;
+const float sGreenScale = 0.74;
+const float sBlueScale  = 0.43;
+const vec3  sepiaScale = vec3(sRedScale, sGreenScale, sBlueScale);
+
 void main(void){
-	vec4 smpColor = texture2D(texture, vTexCoord);
+	vec4  smpColor  = texture2D(texture, vTexCoord);
+	float grayColor = dot(smpColor.rgb, monochromeScale);
 	if(grayScale){
-		// オフスクリーンレンダリングした画像に係数をかけて足す
-		float grayColor = dot(smpColor.rgb, monochromeScale);
 		smpColor = vec4(vec3(grayColor), 1.0);
+	}else if(sepia){
+		vec3 monoColor = vec3(grayColor) * sepiaScale; 
+		smpColor = vec4(monoColor, 1.0);
 	}
 	gl_FragColor = smpColor;
 }
@@ -79,7 +84,9 @@ void main(void){
 	<body>
 		<canvas id="canvas"></canvas>
 		<p>
-			<input id="grayScale" name="radio" type="checkbox"> gray scale
+			<input id="color" name="radio" type="radio" checked> color
+			<input id="gray"  name="radio" type="radio"> gray
+			<input id="sepia" name="radio" type="radio"> sepia
 		</p>
 	</body>
 </html>
