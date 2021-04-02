@@ -1,0 +1,68 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>wgld.org WebGL sample 047</title>
+		<script src="https://wgld.org/j/minMatrixb.js" type="text/javascript"></script>
+		<script src="script.js" type="text/javascript"></script>
+		
+		<script id="main_vs" type="x-shader/x-vertex">
+attribute vec3  position;
+attribute vec3  normal;
+attribute vec4  color;
+uniform   mat4  mMatrix;
+uniform   mat4  mvpMatrix;
+uniform   mat4  invMatrix;
+uniform   vec3  lightDirection;
+uniform   vec3  eyePosition;
+uniform   vec4  ambientColor;
+uniform   float fogStart;
+uniform   float fogEnd;
+varying   vec4  vColor;
+varying   float fogFactor;
+
+const float near = 0.1;
+const float far  = 30.0; // far30のP行列を使う前提のコード
+const float linerDepth = 1.0 / (far - near);
+
+void main(void){
+	vec3  invLight = normalize(invMatrix * vec4(lightDirection, 0.0)).xyz;
+	vec3  invEye   = normalize(invMatrix * vec4(eyePosition, 0.0)).xyz;
+	vec3  halfLE   = normalize(invLight + invEye);
+	float diffuse  = clamp(dot(normal, invLight), 0.1, 1.0);
+	float specular = pow(clamp(dot(normal, halfLE), 0.0, 1.0), 50.0);
+	vec4  amb      = color * ambientColor;
+	vColor         = amb * vec4(vec3(diffuse), 1.0) + vec4(vec3(specular), 1.0);
+	
+	vec3  pos      = (mMatrix * vec4(position, 1.0)).xyz;
+	// 深度を計算
+	float linerPos = length(eyePosition - pos) * linerDepth;
+	// 0で完全にフォグがかかる
+	fogFactor      = clamp((fogEnd - linerPos) / (fogEnd - fogStart), 0.0, 1.0);
+	
+	gl_Position    = mvpMatrix * vec4(position, 1.0);
+}
+		</script>
+		
+		<script id="main_fs" type="x-shader/x-fragment">
+precision mediump float;
+
+uniform vec4  fogColor;
+varying vec4  vColor;
+varying float fogFactor;
+
+void main(void){
+	gl_FragColor = mix(fogColor, vColor, fogFactor);
+}
+		</script>
+		
+	</head>
+	<body>
+		<canvas id="canvas"></canvas>
+		<p>
+			<input id="fogStart" type="range" value="50" min="0" max="100"> fogStart
+		</p>
+		<p>
+			<input id="fogEnd" type="range" value="100" min="0" max="100"> fogEnd
+		</p>
+	</body>
+</html>
