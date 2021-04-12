@@ -1,0 +1,79 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>wgld.org WebGL sample 053</title>
+		<script src="minMatrixb.js" type="text/javascript"></script>
+		<script src="script.js" type="text/javascript"></script>
+		
+		<script id="main_vs" type="x-shader/x-vertex">
+// リムライティンググローシェーディング
+attribute vec3  position;
+attribute vec3  normal;
+attribute vec4  color;
+uniform   mat4  mMatrix;
+uniform   mat4  mvpMatrix;
+uniform   mat4  invMatrix;
+
+// 視線ベクトルとライトベクトルのなす角が180度のときにリムライトが強くなるようにしたいので、ライトベクトルと視線ベクトル、目の位置を渡して計算する
+uniform   vec3  lightDirection;
+uniform   vec3  eyes;// カメラの注視点
+uniform   vec3  eyePosition; // カメラの位置
+
+// リムライト設定
+uniform   vec4  rimColor;
+uniform   float rimCoef;
+
+varying   vec4  vColor;
+
+void main(void){
+	vec3  invLight = normalize(invMatrix * vec4(lightDirection, 0.0)).xyz;
+	vec3  invEye   = normalize(invMatrix * vec4(eyePosition, 0.0)).xyz;
+	vec3  halfLE   = normalize(invLight + invEye);
+	float diffuse  = clamp(dot(normal, invLight), 0.1, 1.0);
+	float specular = pow(clamp(dot(normal, halfLE), 0.0, 1.0), 50.0);
+	
+	// 頂点法線と視線ベクトルが90度に近いほどリムライト係数が大きくなる
+	// powでコントラストを強くする
+	float rim      = pow(1.0 - clamp(dot(normal, invEye), 0.0, 1.0), 5.0);
+
+	// マイナス視線ベクトルとライトベクトルの内積を取り、powでコントラストを強調
+	float dotLE    = pow(max(dot(normalize(eyes - eyePosition), normalize(lightDirection)), 0.0), 30.0);
+
+	// 最終的なリムライトの色を計算
+	vec4  ambient  = rimColor * rimCoef * rim * dotLE;
+
+	vColor         = color * vec4(vec3(diffuse), 1.0) + vec4(vec3(specular), 1.0) + vec4(ambient.rgb, 1.0);
+	gl_Position    = mvpMatrix * vec4(position, 1.0);
+}
+		</script>
+		
+		<script id="main_fs" type="x-shader/x-fragment">
+precision mediump float;
+
+varying vec4  vColor;
+
+void main(void){
+	gl_FragColor = vColor;
+}
+		</script>
+		
+		<script id="ray_vs" type="x-shader/x-vertex">
+attribute vec3 position;
+attribute vec4 color;
+uniform   mat4 mvpMatrix;
+varying   vec4 vColor;
+
+void main(void){
+	vColor      = color;
+	gl_Position = mvpMatrix * vec4(position, 1.0);
+}
+		</script>
+		
+	</head>
+	<body>
+		<canvas id="canvas"></canvas>
+		<p>
+			<input type="range" id="rimCoef" min="0" max="200" value="100"> rim light coefficient (0.0 to 2.0)
+		</p>
+	</body>
+</html>
