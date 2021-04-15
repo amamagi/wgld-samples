@@ -1,0 +1,73 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>wgld.org WebGL sample 076</title>
+		<script src="minMatrixb.js" type="text/javascript"></script>
+		<script src="script.js" type="text/javascript"></script>
+		
+		<script id="vs" type="x-shader/x-vertex">
+attribute vec3  position;
+attribute vec3  normal;
+attribute vec4  color;
+uniform   mat4  mvpMatrix;
+uniform   mat4  invMatrix;
+uniform   vec3  lightDirection;
+varying   float vDiffuse; // ハーフトーン同様Diffuseを返す
+varying   vec4  vColor;
+
+void main(void){
+	vec3 invLight = normalize(invMatrix * vec4(lightDirection, 0.0)).xyz;
+	vDiffuse = clamp(dot(normal, invLight), 0.0, 1.0);
+	vColor = color;
+	gl_Position = mvpMatrix * vec4(position, 1.0);
+}
+		</script>
+		
+		<script id="fs" type="x-shader/x-fragment">
+precision mediump float;
+
+uniform float lineScale;
+varying float vDiffuse;
+varying vec4  vColor;
+
+void main(void){
+	vec2 v = gl_FragCoord.xy * lineScale;
+	
+	// cross line
+//	float f = max(sin(v.x + v.y), 0.0);
+//	float g = max(sin(v.x - v.y), 0.0);
+//	
+//	float s;
+//	if(vDiffuse > 0.6){
+//		s = 0.8;
+//	}else if(vDiffuse > 0.1){
+//		s = 0.6 - pow(f, 5.0);
+//	}else{
+//		s = 0.4 - (pow(f, 5.0) + pow(g, 5.0));
+//	}
+//	gl_FragColor = vec4(vColor.rgb * s, 1.0);
+	
+	// v.x + v.y は x=y 軸に沿って単調増加する。
+	// 等高線はx=-yに並行になる。
+	// これをsinに通せば斜めの波になる
+	float f = sin(v.x + v.y);
+	
+	float s;
+	if(vDiffuse > 0.7){
+		s = 0.9;
+	}else if(vDiffuse > 0.3){
+		s = 0.6;
+	}else{
+		s = 0.3;
+	}
+	gl_FragColor = vec4(vColor.rgb * (vDiffuse + f + s), 1.0);	
+}
+		</script>
+	</head>
+	<body>
+		<canvas id="canvas"></canvas>
+		<p>
+			<input type="range" id="range" min="60" max="120" value="90"> line scale
+		</p>
+	</body>
+</html>
