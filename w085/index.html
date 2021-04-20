@@ -1,0 +1,124 @@
+<html>
+<head>
+    <title>wgld.org WebGL sample 098</title>
+    <script src="minMatrixb.js" type="text/javascript"></script>
+    <script src="script.js" type="text/javascript"></script>
+
+    <script id="mrt_vs" type="x-shader/x-vertex">
+// MRTシェーダー
+attribute vec3  position;
+attribute vec3  normal;
+attribute vec4  color;
+uniform   mat4  mvpMatrix;
+uniform   vec4  ambient;
+varying   vec4  vColor;
+varying   vec3  vNormal;
+varying   float vDepth;
+
+void main(){
+    gl_Position = mvpMatrix * vec4(position, 1.0);
+    vColor = color * ambient;
+    vNormal = normal;
+    vDepth = gl_Position.z / gl_Position.w;
+}
+    </script>
+
+    <script id="mrt_fs" type="x-shader/x-fragment">
+#extension GL_EXT_draw_buffers : require
+
+precision mediump float;
+
+varying vec4  vColor;
+varying vec3  vNormal;
+varying float vDepth;
+
+void main(){
+	// 頂点カラー、深度、法線をそれぞれテクスチャに書き込む
+    gl_FragData[0] = vColor;
+    gl_FragData[1] = vec4(vec3((vDepth + 1.0) / 2.0), 1.0);
+    gl_FragData[2] = vec4((vNormal + 1.0) / 2.0, 1.0);
+}
+    </script>
+
+    <script id="edge_vs" type="x-shader/x-vertex">
+// エッジ検出シェーダー
+attribute vec3 position;
+attribute vec2 texCoord;
+varying vec2 vTexCoord;
+
+void main(){
+    vTexCoord = texCoord;
+    gl_Position = vec4(position, 1.0);
+}
+    </script>
+
+    <script id="edge_fs" type="x-shader/x-fragment">
+precision mediump float;
+
+uniform vec2 resolution;
+// Laplacialフィルタ用の座標オフセットとウェイトはjsから渡す
+uniform vec2 offsetCoord[9];
+uniform float weight[9];
+uniform sampler2D textureColor;
+uniform sampler2D textureDepth;
+uniform sampler2D textureNormal;
+varying vec2 vTexCoord;
+
+void main(){
+	// ピクセルをずらして参照するためのオフセットを計算
+    vec2 offsetScale = 1.0 / resolution;
+    vec4 destColor = texture2D(textureColor, vTexCoord);
+    vec3 normalColor = vec3(0.0);
+	// 全要素を足すのをdotで楽したいだけのために用意されるベクトル
+    vec3 tmpColor = vec3(1.0);
+    float depthEdge = 0.0;
+    float normalEdge = 0.0;
+
+	// Laplacianフィルタ
+    for(int i = 0; i < 9; ++i){
+        vec2 offset = vTexCoord + offsetCoord[i] * offsetScale;
+        depthEdge += texture2D(textureDepth, offset).r * weight[i];
+        normalColor += texture2D(textureNormal, offset).rgb * weight[i];
+    }
+
+	// 法線のエッジ検出結果についてXYZそれぞれabsで畳んでから3軸の平均取る
+    normalEdge = dot(abs(normalColor), tmpColor) / 3.0;
+
+	// 深度のエッジ検出結果をそのまま使うと眠いので二値化して強調
+    if(abs(depthEdge) > 0.02){
+        depthEdge = 1.0;
+    }else{
+        depthEdge = 0.0;
+    }
+    float edge = (1.0 - depthEdge) * (1.0 - normalEdge);
+    gl_FragColor = vec4(destColor.rgb * edge, destColor.a);
+}
+    </script>
+
+    <script id="preview_vs" type="x-shader/x-vertex">
+attribute vec3 position;
+attribute vec2 texCoord;
+uniform vec3 offset;
+varying vec2 vTexCoord;
+
+void main(){
+    vTexCoord = texCoord;
+    gl_Position = vec4(position * 0.25 + offset, 1.0);
+}
+    </script>
+
+    <script id="preview_fs" type="x-shader/x-fragment">
+precision mediump float;
+
+uniform sampler2D texture;
+varying vec2 vTexCoord;
+
+void main(){
+    gl_FragColor = texture2D(texture, vTexCoord);
+}
+    </script>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+</body>
+</html>
