@@ -1,0 +1,32 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>wgld.org WebGL sample 099</title>
+        <script src="minMatrixb.js" type="text/javascript"></script>
+        <script src="script.js" type="text/javascript"></script>
+        <script id="vs" type="x-shader/x-vertex">
+attribute vec3 position;
+attribute vec4 color;
+
+varying vec4 vColor;
+
+void main(){
+    vColor = color;
+    gl_Position = vec4(position, 1.0);
+}
+        </script>
+        <script id="fs" type="x-shader/x-fragment">
+precision mediump float;
+
+varying vec4 vColor;
+
+void main(void){
+    gl_FragColor = vColor;
+}
+        </script>
+    </head>
+    <body>
+        <canvas id="canvas"></canvas>
+        <p id="info"></p>
+    </body>
+</html>
