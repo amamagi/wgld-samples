@@ -1,0 +1,47 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>wgld.org WebGL sample 102</title>
+        <script src="minMatrixb.js" type="text/javascript"></script>
+        <script src="script.js" type="text/javascript"></script>
+
+        <script id="vs" type="x-shader/x-vertex">
+attribute vec3 position;
+attribute vec3 normal;
+uniform   mat4 mvpMatrix;
+uniform   mat4 normalMatrix; // MV行列の転置逆行列
+varying   vec3 vNormal;
+
+void main(void){
+    vNormal = normalize((normalMatrix * vec4(normal, 0.0)).xyz);
+    gl_Position = mvpMatrix * vec4(position, 1.0);
+}
+        </script>
+
+        <script id="fs" type="x-shader/x-fragment">
+precision mediump float;
+
+uniform sampler2D texture;
+varying vec3 vNormal;
+
+void main(void){
+    vec2 texCoord = (vNormal.xy + 1.0) / 2.0;
+    vec4 smpColor = texture2D(texture, vec2(texCoord.s, 1.0 - texCoord.t));
+    gl_FragColor = smpColor;
+}
+        </script>
+    </head>
+    <body>
+        <canvas id="canvas"></canvas>
+        <p><select id="select">
+            <option value="0">texture 0</option>
+            <option value="1">texture 1</option>
+            <option value="2">texture 2</option>
+            <option value="3">texture 3</option>
+            <option value="4">texture 4</option>
+            <option value="5">texture 5</option>
+            <option value="6">texture 6</option>
+            <option value="7">texture 7</option>
+        </select></p>
+    </body>
+</html>
