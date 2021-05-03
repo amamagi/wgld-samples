@@ -8,28 +8,41 @@ def main():
         if os.path.isdir(obj) and not obj.startswith("."):
             dir.append(obj)
 
+    print(dir)
+
     gen_lines = ''
     thumb = 'thumb.png'
     base = 'https://amamagi.github.io/wgld-samples'
     max_igm_size = 256
     width = '200'
+
     for d in dir:
-        img_path = '{0}/{1}'.format(d, thumb)
-        if not os.path.exists(img_path):
-            continue
-        img = Image.open(img_path)
-        dirty = False
-        if not img.size[0] == img.size[1]:
-            img = crop_max_square(img)
-            dirty = True
-            print('croped ' + img_path)
-        if  img.size[0] > max_igm_size:
-            img = img.resize((max_igm_size, max_igm_size), Image.BICUBIC)
-            dirty = True
-            print('resized  ' + img_path)
-        if dirty:
-            img.save(img_path)
-        gen_lines += '<a href="{3}/{4}"><img src="{0}" alt="{1}" width="{2}"/></a>'.format(img_path, d, width, base, d)
+        ls = os.listdir(d)
+
+        sub_dir = []
+        for obj in ls:
+            if os.path.isdir(os.path.join(d, obj)) and not obj.startswith("."):
+                sub_dir.append(obj)
+
+        print(sub_dir)
+        for sd in sub_dir:
+            img_path = '{0}/{1}/{2}'.format(d, sd, thumb)
+            if not os.path.exists(img_path):
+                continue
+            img = Image.open(img_path)
+            dirty = False
+            if not img.size[0] == img.size[1]:
+                img = crop_max_square(img)
+                dirty = True
+                print('croped ' + img_path)
+            if  img.size[0] > max_igm_size:
+                img = img.resize((max_igm_size, max_igm_size), Image.BICUBIC)
+                dirty = True
+                print('resized  ' + img_path)
+            if dirty:
+                img.save(img_path)
+            href = "{0}/{1}/{2}".format(base, d, sd)
+            gen_lines += '<a href="{0}"><img src="{1}" alt="{2}" width="{3}"/></a>'.format(href, img_path, sd, width)
 
     gen_lines += '\n'
 
