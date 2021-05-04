@@ -1,0 +1,99 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><!-- fragment shader --><script id="fs" type="x-shader/x-fragment">precision mediump float;
+    uniform float time;
+    uniform vec2  mouse;
+    uniform vec2  resolution;
+    
+    const vec3 cPos = vec3(0.0,  0.0,  3.0);
+    const vec3 cDir = vec3(0.0,  0.0, -1.0);
+    const vec3 cUp  = vec3(0.0,  1.0,  0.0);
+    
+    const vec3 lightDir = vec3(-0.57, 0.57, 0.57);
+
+    vec3 trans(vec3 p){
+        return mod(p, .8) - .4;
+    }
+
+    float distFuncBox(vec3 p){
+        vec3 q = abs(trans(p));
+        return length(max(q - vec3(0.3, 0.3, 0.3), 0.0));
+    }
+
+    float distFuncSphere(vec3 p){
+        return length(p) - 1.5;
+    }
+    
+    // distance function
+    float distFunc(vec3 p){
+        //return distFuncBox(p);
+        float d1 = distFuncBox(p);
+        float d2 = distFuncSphere(p);
+        return max(d1, d2);
+    }
+    
+    vec3 genNormal(vec3 p){
+        float d = 0.0001;
+        return normalize(vec3(
+            distFunc(p + vec3(  d, 0.0, 0.0)) - distFunc(p + vec3( -d, 0.0, 0.0)),
+            distFunc(p + vec3(0.0,   d, 0.0)) - distFunc(p + vec3(0.0,  -d, 0.0)),
+            distFunc(p + vec3(0.0, 0.0,   d)) - distFunc(p + vec3(0.0, 0.0,  -d))
+        ));
+    }
+    
+    void main(void){
+        // fragment position
+        vec2 p = (gl_FragCoord.xy * 2.0 - resolution) / min(resolution.x, resolution.y);
+        
+        // camera and ray
+        vec3 cSide = cross(cDir, cUp);
+        float targetDepth = 1.0;
+        vec3 ray = normalize(cSide * p.x + cUp * p.y + cDir * targetDepth);
+        
+        // marching loop
+        float tmp, dist;
+        tmp = 0.0;
+        vec3 dPos = cPos;
+        for(int i = 0; i < 256; i++){
+            dist = distFunc(dPos);
+            tmp += dist;
+            dPos = cPos + tmp * ray;
+        }
+        
+        // hit check
+        vec3 color;
+        if(abs(dist) < 0.001){
+            vec3 normal = genNormal(dPos);
+            float diff = clamp(dot(lightDir, normal), 0.1, 1.0);
+            color = vec3(1.0, 1.0, 1.0) * diff;
+        }else{
+            color = vec3(0.0);
+        }
+        gl_FragColor = vec4(color, 1.0);
+    }
+    </script><!-- /fragment shader -->
+    
+    <!-- vertex shader --><script id="vs" type="x-shader/x-vertex">
+    attribute vec3 position;
+    
+    void main(void){
+        gl_Position = vec4(position, 1.0);
+    }
+    </script><!-- /vertex shader -->
+    
+    <script src="script.js" type="text/javascript"></script>
+    <style type="text/css">
+        * {
+            text-align: center;
+            margin: 10px auto;
+            padding: 0px;
+        }
+        canvas {
+            box-shadow: 0px 0px 0px 1px gray;
+        }
+    </style>
+    <title>wgld.org WebGL sample 068</title>
+    </head>
+    <body>
+        <canvas id="canvas"></canvas>
+        <p><input type="checkbox" id="check" checked><label for="check"> auto run</label></p>
+    </body></html>
+    
