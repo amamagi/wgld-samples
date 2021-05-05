@@ -1,0 +1,54 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>wgld.org canvas2D sample 003</title>
+		<script src="https://wgld.org/j/normalMap.js" type="text/javascript"></script>
+		<script type="text/javascript">
+			var cSrc, cDest, iFile, bGen;
+			var xSrc, xDest;
+			onload = function(){
+				cSrc  = document.getElementById('src');
+				cDest = document.getElementById('dest');
+				iFile = document.getElementById('file');
+				bGen  = document.getElementById('button');
+				bGen.addEventListener('click', convert, true);
+			};
+			
+			function convert(){
+				if(iFile.files.length === 1){
+					var f = iFile.files[0];
+					var fRead = new FileReader();
+					fRead.onload = function(e){
+						var i = new Image();
+						i.onload = function(){
+							var w = i.naturalWidth;
+							var h = i.naturalHeight;
+							cSrc.width  = w; cSrc.height  = h;
+							cDest.width = w; cDest.height = h;
+							xSrc  = cSrc.getContext('2d');
+							xDest = cDest.getContext('2d');
+							
+							xSrc.drawImage(i, 0, 0, w, h);
+							var normalMapImageData = normalMap(cSrc);
+							xDest.putImageData(normalMapImageData, 0, 0, 0, 0, w, h);
+						};
+						i.src = e.target.result;
+					};
+					fRead.readAsDataURL(f);
+				}
+			}
+		</script>
+		<style type="text/css">
+			canvas {
+				border: 1px solid gray;
+				margin: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<p><input type="file" id="file"></p>
+		<p><input type="button" id="button" value="normal map generate"></p>
+		<canvas id="src"></canvas>
+		<canvas id="dest"></canvas>
+	</body>
+</html>
