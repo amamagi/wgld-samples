@@ -8,8 +8,6 @@ def main():
         if os.path.isdir(obj) and not obj.startswith("."):
             dir.append(obj)
 
-    print(dir)
-
     gen_lines = ''
     thumb = 'thumb.png'
     base = 'https://amamagi.github.io/wgld-samples'
@@ -24,7 +22,6 @@ def main():
             if os.path.isdir(os.path.join(d, obj)) and not obj.startswith("."):
                 sub_dir.append(obj)
 
-        print(sub_dir)
         for sd in sub_dir:
             img_path = '{0}/{1}/{2}'.format(d, sd, thumb)
             if not os.path.exists(img_path):
