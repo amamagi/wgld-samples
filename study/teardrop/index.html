@@ -53,7 +53,7 @@ float opSmoothUnion( float d1, float d2, float k ) {
 
 float distanceFunc(vec3 p){
     vec3 q = vec3(p.x, p.y / .8, p.z);
-    return mix(sdTear(p), sdTear(trans(p, 6.0)), mod(time/10.,1.4));
+    return mix(sdTear(p), sdTear(trans(p, 6.0)), (sin(time/7.) + 1.5) * 0.5);
 }
 
 vec3 getNormal(vec3 p){
